@@ -1,0 +1,27 @@
+name: Build & Publish
+on:
+    push:
+        branches:
+            - master
+    schedule:
+        -   cron: '0 0 * * 1'
+
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@master
+
+            - name: Login
+              run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+              env:
+                DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+                DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build
+              run: docker build -t wearejh/rust-macos-build .
+
+            - name: Publish
+              run: docker push wearejh/rust-macos-build
